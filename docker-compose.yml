@@ -1,0 +1,28 @@
+version: '3'
+services:
+  mysql:
+    image: 'mysql:5.7'
+    volumes:
+      - ./src/main/resources/db/dump/Dump20191213.sql:/docker-entrypoint-initdb.d/dump.sql
+    ports:
+      - '3306:3306'
+    environment:
+      MYSQL_ROOT_PASSWORD: 'admin'
+      MYSQL_DATABASE: 'motoring'
+  solace:
+    image: 'store/solace/solace-pubsub-standard:9.0.1.7'
+    ports:
+      - '8080:8080'
+      - '55555:55555'
+      - '22:22'
+      - '2222:2222'
+    shm_size: '2g'
+    environment:
+      username_admin_globalaccesslevel: admin
+      username_admin_password: admin
+  start_dependencies:
+    image: dadarek/wait-for-dependencies
+    depends_on:
+      - mysql
+      - solace
+    command: mysql:3306 solace:8080

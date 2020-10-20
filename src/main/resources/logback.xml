@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+	<property name="APP_HOME" value="./" />
+
+	<appender name="STDOUT"
+		class="ch.qos.logback.core.ConsoleAppender">
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<Pattern>
+				%d{yyyy-MM-dd HH:mm:ss}[%thread][%logger]%-5level - %msg%n
+			</Pattern>
+		</layout>
+	</appender>
+
+	<appender name="FILE"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${APP_HOME}/logs/paynow.log</file>
+		<encoder
+			class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<Pattern>
+				%d{yyyy-MM-dd HH:mm:ss}[%thread][%logger]%-5level - %msg%n
+			</Pattern>
+		</encoder>
+
+		<!-- <filter class="ch.qos.logback.classic.filter.ThresholdFilter"> <level>INFO</level> 
+			</filter> -->
+
+		<rollingPolicy
+			class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!-- rollover daily -->
+			<fileNamePattern>${APP_HOME}/archived/paynow.%d{yyyy-MM-dd}.%i.log.gz
+			</fileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy
+				class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<maxFileSize>10MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+		</rollingPolicy>
+	</appender>
+
+	<appender name="FILE-ERROR"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${APP_HOME}/logs/error.log</file>
+		<encoder
+			class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<Pattern>
+				%d{yyyy-MM-dd HH:mm:ss}[%thread][%logger]%-5level - %msg%n
+			</Pattern>
+		</encoder>
+
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>ERROR</level>
+		</filter>
+
+		<rollingPolicy
+			class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!-- rollover daily -->
+			<fileNamePattern>${APP_HOME}/archived/error.%d{yyyy-MM-dd}.%i.log
+			</fileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy
+				class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<maxFileSize>10MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+		</rollingPolicy>
+
+	</appender>
+
+	<appender name="SLOW_SQL_FILE"
+		class="ch.qos.logback.core.FileAppender">
+		<file>${APP_HOME}/logs/slow_sql.log</file>
+		<encoder
+			class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<Pattern>
+				%d{yyyy-MM-dd HH:mm:ss}[%thread][%logger]%-5level - %msg%n
+			</Pattern>
+		</encoder>
+	</appender>
+
+	<appender name="JMS-DEBUG"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${APP_HOME}/logs/paynow.jms.log</file>
+		<encoder
+			class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<Pattern>
+				%d{yyyy-MM-dd HH:mm:ss}[%thread][%logger]%-5level - %msg%n
+			</Pattern>
+		</encoder>
+
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+			<level>DEBUG</level>
+			<onMatch>ACCEPT</onMatch>
+			<onMismatch>DENY</onMismatch>
+		</filter>
+
+		<rollingPolicy
+			class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>app.%d{yyyy-MM-dd}.log.gz</fileNamePattern>
+			<fileNamePattern>${APP_HOME}/archived/paynow.jms.%d{yyyy-MM-dd}.%i.log.gz
+			</fileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy
+				class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<maxFileSize>50MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+		</rollingPolicy>
+	</appender>
+	
+	<logger name="com.nets.upos" level="DEBUG" additivity="false">
+		<appender-ref ref="FILE" />
+		<appender-ref ref="FILE-ERROR" />
+		<appender-ref ref="STDOUT" />
+	</logger>
+	
+	<logger name="com.nets.nps" level="DEBUG" additivity="false">
+		<appender-ref ref="FILE" />
+		<appender-ref ref="FILE-ERROR" />
+		<appender-ref ref="STDOUT" />
+	</logger>
+
+	<logger name="com.mysql" level="DEBUG" additivity="false">
+		<appender-ref ref="FILE" />
+		<appender-ref ref="FILE-ERROR" />
+	</logger>
+	
+	<logger name="org.springframework" level="INFO" additivity="false">
+		<appender-ref ref="FILE" />
+		<appender-ref ref="FILE-ERROR" />
+		<appender-ref ref="STDOUT" />
+	</logger>
+
+	<logger name="org.hibernate.SQL" level="debug"
+		additivity="false">
+		<appender-ref ref="STDOUT" />
+	</logger>
+	<logger name="org.hibernate.type.descriptor.sql" level="trace"
+		additivity="false">
+		<appender-ref ref="STDOUT" />
+	</logger>
+	<logger name="org.hibernate.SQL_SLOW" level="info">
+		<appender-ref ref="SLOW_SQL_FILE" />
+	</logger>
+
+	<logger name="com.solacesystems" level="ERROR"
+		additivity="false">
+		<appender-ref ref="JMS-DEBUG" />
+	</logger>
+
+	<logger name="org.springframework.transaction" level="DEBUG"
+		additivity="false">
+		<appender-ref ref="JMS-DEBUG" />
+	</logger>
+
+	<logger name="org.springframework.orm.jpa" level="DEBUG"
+		additivity="false">
+		<appender-ref ref="JMS-DEBUG" />
+	</logger>
+
+	<logger name="org.springframework.data" level="DEBUG"
+		additivity="false">
+		<appender-ref ref="JMS-DEBUG" />
+	</logger>
+
+	<logger name="org.springframework.integration" level="DEBUG"
+		additivity="false">
+		<appender-ref ref="JMS-DEBUG" />
+	</logger>
+
+	<logger name="org.springframework.jms" level="DEBUG"
+		additivity="false">
+		<appender-ref ref="JMS-DEBUG" />
+	</logger>
+
+	<!-- <root level="DEBUG">
+		<appender-ref ref="STDOUT" />
+		<appender-ref ref="FILE" />
+		<appender-ref ref="FILE-ERROR" />
+	</root> -->
+
+</configuration>

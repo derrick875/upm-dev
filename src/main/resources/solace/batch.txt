@@ -1,0 +1,2 @@
+cd cliscripts
+put src\main\resources\solace\P101.cli

@@ -1,0 +1,23 @@
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:noNamespaceSchemaLocation="ehcache.xsd">
+	<cache name="poses"
+		   maxEntriesLocalHeap="200"
+		   timeToLiveSeconds="600">
+	</cache>
+	<cache name="codes"
+		   maxEntriesLocalHeap="200"
+		   timeToLiveSeconds="600">
+	</cache>
+	<cache name="acquirers"
+		   maxEntriesLocalHeap="200"
+		   timeToLiveSeconds="600">
+	</cache>
+	<cache name="mdrs"
+		   maxEntriesLocalHeap="200"
+		   timeToLiveSeconds="600">
+	</cache>
+	<cache name="banks"
+		   maxEntriesLocalHeap="200"
+		   timeToLiveSeconds="600">
+	</cache>
+</ehcache>
