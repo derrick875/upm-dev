@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:integration="http://www.springframework.org/schema/integration"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+			http://www.springframework.org/schema/beans/spring-beans.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+			http://www.springframework.org/schema/integration
+			http://www.springframework.org/schema/integration/spring-integration.xsd">
+
+	<bean id="solaceCachedConnectionFactory"
+		class="org.springframework.jms.connection.CachingConnectionFactory"
+		primary="true">
+		<property name="targetConnectionFactory"
+			ref="solaceConnectionFactory" />
+		<property name="sessionCacheSize" value="10" />
+		<property name="reconnectOnException" value="true" />
+		<property name="cacheConsumers" value="false" />
+	</bean>
+
+	<bean id="solaceConnectionFactory"
+		class="org.springframework.jndi.JndiObjectFactoryBean"
+		lazy-init="default" autowire="default">
+		<property name="jndiTemplate" ref="solaceJndiTemplate" />
+		<property name="jndiName"
+			value="${solace.connection.factory}" />
+	</bean>
+
+	<import
+		resource="classpath:META-INF/tsp-request.xml" />
+	<import
+		resource="classpath:META-INF/upi-request.xml" />
+		
+	<beans profile="local">
+		<bean id="solaceJndiTemplate"
+			class="org.springframework.jndi.JndiTemplate">
+			<property name="environment">
+				<map>
+					<entry key="java.naming.provider.url" value="${solace.url}" />
+					<entry key="java.naming.factory.initial"
+						value="com.solacesystems.jndi.SolJNDIInitialContextFactory" />
+					<entry key="java.naming.security.principal"
+						value="${solace.username}" />
+					<entry key="java.naming.security.credentials"
+						value="${solace.password}" />
+					<entry key="Solace_JMS_VPN" value="${solace.vpn}" />
+					<entry key="host" value="portal" />
+
+				</map>
+			</property>
+		</bean>
+	</beans>
+</beans>

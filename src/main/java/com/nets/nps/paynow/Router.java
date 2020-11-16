@@ -7,6 +7,7 @@ import com.nets.nps.paynow.exception.ExceptionHandler;
 import com.nets.nps.paynow.handlers.CreditNotificationHandler;
 import com.nets.nps.paynow.handlers.OrderHandler;
 import com.nets.nps.paynow.handlers.OrderQueryHandler;
+import com.nets.nps.paynow.handlers.QrcGenerationHandler;
 import com.nets.nps.paynow.handlers.ReversalHandler;
 import com.nets.upos.commons.exception.BaseBusinessException;
 import com.nets.upos.commons.exception.JsonFormatException;
@@ -33,6 +34,9 @@ public class Router {
     
     @Autowired
 	ExceptionHandler exceptionHandler;
+    
+    @Autowired
+    QrcGenerationHandler qrcGenerationHandler;
 
     public Response route(String mti, String processCode, Request request) {
         try {
@@ -51,7 +55,8 @@ public class Router {
                
                 case ORDER_REVERSAL:	
                 	return reversalHandler.handle(mtiMapper, request);
-                	
+                case QR_GENERATION:
+                	return qrcGenerationHandler.handle(mtiMapper, request);
                 default:
                     // TODO add logic if there is no handler found
                     return null;

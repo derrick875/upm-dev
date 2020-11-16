@@ -7,6 +7,7 @@ import com.nets.nps.paynow.entity.CreditNotificationRequest;
 import com.nets.nps.paynow.entity.OrderQueryRequest;
 import com.nets.nps.paynow.entity.ReversalRequest;
 import com.nets.nps.paynow.entity.RefundReversalRequest;
+import com.nets.nps.paynow.entity.QrcGenerationRequest;
 import com.nets.nps.core.entity.Request;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -19,9 +20,10 @@ public enum MtiRequestMapper {
 	ORDER("0200","995000","Order",OrderRequest.class),
 	ORDER_QUERY("0100","335000","OrderQuery",OrderQueryRequest.class),
 	ORDER_REVERSAL("0400","995000","Reversal",ReversalRequest.class),
-	REFUNDREVERSAL("8400","440000","RefundReversal",RefundReversalRequest.class);	
-	
-    // TODO consider mti to be number, present as 4 bit String
+	REFUNDREVERSAL("8400","440000","RefundReversal",RefundReversalRequest.class),
+	QR_GENERATION("0300", "700000", "QRGeneration", QrcGenerationRequest.class);
+    
+	// TODO consider mti to be number, present as 4 bit String
     private final int MTI_LENGTH = 4;
 
     private final String mti;

@@ -12,6 +12,7 @@ import org.springframework.boot.context.TypeExcludeFilter;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.context.annotation.ImportResource;
 
 @SpringBootApplication
 @ComponentScan(basePackages = { "com.nets" },
@@ -20,6 +21,7 @@ import org.springframework.context.annotation.FilterType;
 				@ComponentScan.Filter(type = FilterType.CUSTOM, classes = AutoConfigurationExcludeFilter.class),
 				@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = { TerminalCryptoHSMConfig.class,
 						AppHSMEncryptionSvc.class, AppHSMEncryptionTokenDbServiceImpl.class }) })
+@ImportResource("classpath*:/spring-context.xml")
 public class PaynowApplication {
 
 	public static void main(String[] args) {
