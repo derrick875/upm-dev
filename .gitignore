@@ -48,3 +48,22 @@ Thumbs.db
 *.mov
 *.wmv
 
+# Ignore Gradle project-specific cache directory
+.gradle
+
+# Ignore Gradle build output directory
+build
+bin
+
+# Ignore Eclipse
+.classpath
+.project
+.settings/
+.metadata/
+
+# Igore IntelliJ
+.idea
+
+# Ignore logs
+logs
+archived
