@@ -17,12 +17,13 @@ public class SolaceMessageReceiver {
 
 	@Value("${solace.tsp.to.processor.queue.name}")
 	private String tspConsume;
-
+	
 	JmsTemplate jmsTemplate;
 
 	public String receiveMessage(String correlationId) {
 
 		logger.info("SolaceMessageReceiver trying to receive message correlation id:" + correlationId);
+		logger.info("Receiving from queue: " + tspConsume);
 		String resCorrelationId = "JMSCorrelationID = '" + correlationId + "'";
 		logger.info("getJmsTemplate value        ::"+jmsTemplate);
 		getJmsTemplate().setDefaultDestinationName(tspConsume);

@@ -3,6 +3,7 @@ package com.nets.nps.client.impl;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -15,37 +16,42 @@ import com.nets.upos.commons.logger.ApsLogger;
 
 @Service
 public class UpiQrcGenerationRequestAdapter {
-	
-	 private static final ApsLogger logger = new ApsLogger(UpiQrcGenerationRequestAdapter.class);
-	 
-	 @Value("${deviceId}")
-	 private String deviceId;
-	 
-	 @Value("${userId}")
-	 private String userId;
-	 
-	 public UpiQrcGenerationRequest handleQrGenReq(QrcGenerationRequest qrcGenerationRequest) {
-		 logger.info("UpiQrcGenerationRequestAdapter: handleQrcGenerationRequest service started");
-		 UpiQrcGenerationRequest upiQrcGenerationRequest = createUpiQrcGenerationRequest(qrcGenerationRequest);
+
+	private static final ApsLogger logger = new ApsLogger(UpiQrcGenerationRequestAdapter.class);
+
+	@Value("${deviceId}")
+	private String deviceId;
+
+	@Value("${userId}")
+	private String userId;
+
+	@Value("#{${nets.upi.appgateway.instId.map}}")
+	private Map<String, String> instIdMap;
+
+	public UpiQrcGenerationRequest handleQrGenReq(QrcGenerationRequest qrcGenerationRequest) {
+		logger.info("UpiQrcGenerationRequestAdapter: handleQrcGenerationRequest service started");
+		UpiQrcGenerationRequest upiQrcGenerationRequest = createUpiQrcGenerationRequest(qrcGenerationRequest);
 		return upiQrcGenerationRequest; 
-	 }
+	}
 
 	private UpiQrcGenerationRequest createUpiQrcGenerationRequest(QrcGenerationRequest qrGenerationRequest) {
 		UpiQrcGenerationRequest upiQrcGenerationRequest = new UpiQrcGenerationRequest();
 		MsgInfo msgInfo = new MsgInfo();
 		UpiQrcGenerationRequestTransactionRequest trxInfo = new UpiQrcGenerationRequestTransactionRequest();
-		
+
 		Timestamp currentTimeStamp = new Timestamp(Calendar.getInstance().getTimeInMillis());
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddhhmmss");
-        
-        String msgId = UtilComponents.getMsgId(qrGenerationRequest.getInstitutionCode());
-        
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddhhmmss");
+
+		String upiInsId=instIdMap.get(qrGenerationRequest.getInstitutionCode())==null?qrGenerationRequest.getInstitutionCode():instIdMap.get(qrGenerationRequest.getInstitutionCode());
+
+		String msgId = UtilComponents.getMsgId(upiInsId);
+		
 		msgInfo.setVersionNo("1.0.0");
 		msgInfo.setMsgId(msgId);
 		msgInfo.setTimeStamp(formatter.format(currentTimeStamp));
 		msgInfo.setMsgType("QRC_GENERATION");
-		msgInfo.setInsID(qrGenerationRequest.getInstitutionCode());
-		
+		msgInfo.setInsID(upiInsId);
+
 		trxInfo.setDeviceID(deviceId);
 		trxInfo.setUserID(userId);
 		trxInfo.setToken(qrGenerationRequest.getSofAccountId());
@@ -56,14 +62,14 @@ public class UpiQrcGenerationRequestAdapter {
 
 		upiQrcGenerationRequest.setMsgInfo(msgInfo);
 		upiQrcGenerationRequest.setTrxInfo(trxInfo);
-		
+
 		return upiQrcGenerationRequest;
 	}
-	 
-	 
-	 
-	 
-	 
-	 
-	 
+
+
+
+
+
+
+
 }

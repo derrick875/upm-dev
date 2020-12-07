@@ -1,0 +1,34 @@
+{
+	"header": {
+		"release_number": "50",
+		"mti": "9200",
+		"nets_tag_1": "B238048008E00000",
+		"originator_code": "7",
+		"responder_code": "0",
+		"product_indicator": "02",
+		"status": "003"
+	},
+	"body": {
+		"trxn_time": "",
+		"retailer_info": "",
+		"entry_mode": "",
+		"retailer_id": "",
+		"processing_code": "",
+		"trxn_date": "",
+		"xmit_datetime": "",
+		"ret_ref_num": "",
+		"nets_tag_2": "0000000000000004",
+		"txn_specific_data": [
+			{
+				"nets_token_id":"123412341234",
+				"sub_id": "",
+				"scheme_vc_pan": "6234560000161821 ",
+				"status": "B"
+			}
+		],
+		"trxn_amount": "",
+		"stan": "",
+		"terminal_id": "",
+		"condition_code": ""
+	}
+}

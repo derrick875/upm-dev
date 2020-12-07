@@ -4,6 +4,7 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
@@ -21,6 +22,7 @@ public class UpiProxySender {
 	@Value("${solace.processor.to.upiproxy.topic.name}")
 	String upiProxyTopic;
 
+	@Autowired
 	JmsTemplate jmsTemplate;
 	
 	public void put(UpiQrcGenerationRequest upiQrGenReq) {

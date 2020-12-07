@@ -19,7 +19,6 @@ public class TspCommunicationHandler {
 
 	private static final ApsLogger logger = new ApsLogger(TspCommunicationHandler.class);
 	
-	@Qualifier("tpsMessageProducer")
 	@Autowired
 	SolaceMessageSender solaceMessageSender;
 	

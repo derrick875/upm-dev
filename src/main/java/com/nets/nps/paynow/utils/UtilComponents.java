@@ -1,8 +1,14 @@
 package com.nets.nps.paynow.utils;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Scanner;
 
+import org.springframework.core.io.ClassPathResource;
 import com.google.gson.Gson;
 import com.nets.upos.core.entity.SysTrace;
 
@@ -45,5 +51,33 @@ public class UtilComponents {
 		SimpleDateFormat sdf = new SimpleDateFormat(UPI_TIME_FORMAT);
 		String date = sdf.format(new Date());
 		return date;
+	}
+	
+	@SuppressWarnings("resource")
+	public static String readFileContent(String fileNameWithPath) {
+		ClassPathResource resource = new ClassPathResource(fileNameWithPath);
+		try (InputStream input = resource.getInputStream()) {
+			Scanner s = new Scanner(input, StandardCharsets.UTF_8.name()).useDelimiter("\\A");
+			return s.hasNext() ? s.next() : "";
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	
+	public static String getRequestJsonString(String fileName) throws IOException {
+		InputStreamReader reader = null;
+		String jsonString = null;
+		try {
+			// Create the pointer to the file containing sample JSON relative to
+			String name = fileName;
+			jsonString = UtilComponents.readFileContent(name);
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		} finally {
+			if (reader != null)
+				reader.close();
+		}
+		return jsonString;
 	}
 }

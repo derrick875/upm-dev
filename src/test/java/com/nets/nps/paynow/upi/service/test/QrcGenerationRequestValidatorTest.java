@@ -1,4 +1,4 @@
-package com.nets.nps.paynow.service.test;
+package com.nets.nps.paynow.upi.service.test;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -11,7 +11,7 @@ import com.nets.nps.paynow.service.impl.QRGenerationRequestValidator;
 import com.nets.upos.commons.exception.JsonFormatException;
 
 @RunWith(JUnit4.class)
-public class QRGenerationRequestValidatorTest {
+public class QrcGenerationRequestValidatorTest {
 	
 	private QrcGenerationRequest request;
 	private QrcGenerationTransactionDomainData transactionDomainData;

@@ -5,6 +5,7 @@ import javax.jms.Message;
 import javax.jms.Session;
 import javax.jms.Topic;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jms.JmsException;
 import org.springframework.jms.core.JmsTemplate;
@@ -24,11 +25,13 @@ public class SolaceMessageSender {
 	@Value("${solace.processor.to.tsp.topic.name}")
 	private String destination;
 
+	@Autowired
 	JmsTemplate jmsTemplate;
 
 	public void put(String detokenization, String correlationId) throws JmsException {
 		logger.info("SolaceMessageSender is sending message with correlationId: "+ correlationId);
-		getJmsTemplate().send(destination, new MessageCreator() {
+		logger.info("Sending to topic: " + destination);
+		jmsTemplate.send(destination, new MessageCreator() {
 			public Message createMessage(Session session) throws JMSException {
 				Message message = session.createTextMessage(detokenization);
 				message.setJMSCorrelationID(correlationId);

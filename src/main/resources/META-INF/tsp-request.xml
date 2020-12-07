@@ -20,16 +20,7 @@
         http://www.springframework.org/schema/oxm http://www.springframework.org/schema/oxm/spring-oxm.xsd">
 
 
-	<!-- Message Producer -->
-	<bean id="producerJmsTemplate" class="org.springframework.jms.core.JmsTemplate">
-		<constructor-arg ref="solaceCachedConnectionFactory" />
-		<property name="pubSubDomain" value="true" />
-	</bean>
 	
-	<bean id="tpsMessageProducer"
-		class="com.nets.upos.commons.solace.SolaceMessageSender">
-		<property name="jmsTemplate" ref="producerJmsTemplate" />
-	</bean>
 	
 	<!-- Message Receiver -->
 
@@ -38,14 +29,8 @@
 		<property name="jmsTemplate" ref="tpsMessageReceiverJmsTemplate" />
 	</bean>
 
-	<bean id="tps.consumerQueue" class="org.springframework.jndi.JndiObjectFactoryBean">
-		<property name="jndiTemplate" ref="solaceJndiTemplate" />
-		<property name="jndiName" value="${solace.tsp.to.processor.queue.name}" />
-	</bean>
-
 	<bean id="tpsMessageReceiverJmsTemplate" class="org.springframework.jms.core.JmsTemplate">
 		<property name="connectionFactory" ref="solaceCachedConnectionFactory" />
-		<property name="defaultDestination" ref="tps.consumerQueue" />
 		<property name="receiveTimeout" value="${qualification.message.receive.timeout}" />
 	</bean>	
 </beans>

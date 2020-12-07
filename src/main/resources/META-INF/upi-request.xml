@@ -18,18 +18,6 @@
         http://www.springframework.org/schema/integration/ws http://www.springframework.org/schema/integration/ws/spring-integration-ws.xsd
         http://www.springframework.org/schema/integration/mail http://www.springframework.org/schema/integration/mail/spring-integration-mail.xsd
         http://www.springframework.org/schema/oxm http://www.springframework.org/schema/oxm/spring-oxm.xsd">
-
-
-	<!-- Message Producer -->
-	<bean id="upiProducerJmsTemplate" class="org.springframework.jms.core.JmsTemplate">
-		<constructor-arg ref="solaceCachedConnectionFactory" />
-		<property name="pubSubDomain" value="true" />
-	</bean>
-	
-	<bean id="upiMessageProducer"
-		class="com.nets.upos.commons.solace.UpiProxySender">
-		<property name="jmsTemplate" ref="upiProducerJmsTemplate" />
-	</bean>
 	
 	<!-- Message Receiver -->
 
@@ -38,14 +26,8 @@
 		<property name="jmsTemplate" ref="upiMessageReceiverJmsTemplate" />
 	</bean>
 
-	<bean id="upi.consumerQueue" class="org.springframework.jndi.JndiObjectFactoryBean">
-		<property name="jndiTemplate" ref="solaceJndiTemplate" />
-		<property name="jndiName" value="${solace.upiproxy.to.qrgeneration.queue.name}" />
-	</bean>
-
 	<bean id="upiMessageReceiverJmsTemplate" class="org.springframework.jms.core.JmsTemplate">
 		<property name="connectionFactory" ref="solaceCachedConnectionFactory" />
-		<property name="defaultDestination" ref="upi.consumerQueue" />
 		<property name="receiveTimeout" value="${qualification.message.receive.timeout}" />
 	</bean>	
 </beans>
