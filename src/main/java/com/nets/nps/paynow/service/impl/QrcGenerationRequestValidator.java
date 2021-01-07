@@ -16,7 +16,7 @@ import com.nets.upos.commons.exception.JsonFormatException;
 import com.nets.upos.commons.validations.MessageFormatValidationErrorCodes;
 
 @Service
-public class QRGenerationRequestValidator {
+public class QrcGenerationRequestValidator {
 	
 	public QrcGenerationRequest validate(QrcGenerationRequest request) throws JsonFormatException {
 		

@@ -9,7 +9,7 @@ import com.nets.nps.core.entity.Response;
 import com.nets.nps.paynow.RequestHandler;
 import com.nets.nps.paynow.entity.QrcGenerationRequest;
 import com.nets.nps.paynow.entity.QrcGenerationResponse;
-import com.nets.nps.paynow.service.impl.QRGenerationRequestValidator;
+import com.nets.nps.paynow.service.impl.QrcGenerationRequestValidator;
 import com.nets.nps.paynow.service.impl.QrcGenerationService;
 import com.nets.upos.commons.logger.ApsLogger;
 
@@ -19,7 +19,7 @@ public class QrcGenerationHandler implements RequestHandler {
 	private static final ApsLogger logger = new ApsLogger(QrcGenerationHandler.class);
 	
 	@Autowired
-	private QRGenerationRequestValidator qrGenerationRequestValidator;
+	private QrcGenerationRequestValidator qrGenerationRequestValidator;
 	
 	@Autowired
 	private QrcGenerationService qrcGenerationService;

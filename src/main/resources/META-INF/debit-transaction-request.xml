@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:int-jms="http://www.springframework.org/schema/integration/jms"
+	xmlns:int-stream="http://www.springframework.org/schema/integration/stream"
+	xmlns:int-event="http://www.springframework.org/schema/integration/event"
+	xmlns:int-http="http://www.springframework.org/schema/integration/http"
+	xmlns:int-ws="http://www.springframework.org/schema/integration/ws"
+	xmlns:int-mail="http://www.springframework.org/schema/integration/mail"
+	xmlns:oxm="http://www.springframework.org/schema/oxm"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+        http://www.springframework.org/schema/integration/jms http://www.springframework.org/schema/integration/jms/spring-integration-jms.xsd
+        http://www.springframework.org/schema/integration/stream http://www.springframework.org/schema/integration/stream/spring-integration-stream.xsd
+        http://www.springframework.org/schema/integration/event http://www.springframework.org/schema/integration/event/spring-integration-event.xsd
+        http://www.springframework.org/schema/integration/http http://www.springframework.org/schema/integration/http/spring-integration-http.xsd
+        http://www.springframework.org/schema/integration/ws http://www.springframework.org/schema/integration/ws/spring-integration-ws.xsd
+        http://www.springframework.org/schema/integration/mail http://www.springframework.org/schema/integration/mail/spring-integration-mail.xsd
+        http://www.springframework.org/schema/oxm http://www.springframework.org/schema/oxm/spring-oxm.xsd">
+
+	<bean id="fx.inboundResponseQueue" class="org.springframework.jndi.JndiObjectFactoryBean">
+		<property name="jndiTemplate" ref="solaceJndiTemplate" />
+		<property name="jndiName" value="${solace.debit.transaction.request.queue.name}" />
+	</bean>
+	
+	<bean id="fx.FxMessageListenerContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+		<property name="connectionFactory" ref="solaceCachedConnectionFactory" />
+		<property name="destination" ref="fx.inboundResponseQueue" />
+	</bean>
+
+	<int-jms:message-driven-channel-adapter
+		id="fx.JmsIn" channel="testInChannel" container="fx.FxMessageListenerContainer"
+		extract-payload="true" />
+
+	<int:channel id="testInChannel" />
+	
+	<int:service-activator input-channel="testInChannel"  ref="debitTransactionService" output-channel="jsonJMSOutChannel1">
+	</int:service-activator>
+	<int:channel id="jsonJMSOutChannel1" />
+
+	<int-jms:outbound-channel-adapter id="jsonJmsOut1"
+		pub-sub-domain="true" destination-expression="'${solace.debit.transaction.response.topic.name}'"
+		channel="jsonJMSOutChannel1" connection-factory="solaceCachedConnectionFactory">
+	</int-jms:outbound-channel-adapter>
+
+</beans>

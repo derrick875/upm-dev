@@ -7,7 +7,7 @@ import org.junit.runners.JUnit4;
 
 import com.nets.nps.paynow.entity.QrcGenerationTransactionDomainData;
 import com.nets.nps.paynow.entity.QrcGenerationRequest;
-import com.nets.nps.paynow.service.impl.QRGenerationRequestValidator;
+import com.nets.nps.paynow.service.impl.QrcGenerationRequestValidator;
 import com.nets.upos.commons.exception.JsonFormatException;
 
 @RunWith(JUnit4.class)
@@ -15,13 +15,13 @@ public class QrcGenerationRequestValidatorTest {
 	
 	private QrcGenerationRequest request;
 	private QrcGenerationTransactionDomainData transactionDomainData;
-	private QRGenerationRequestValidator unit;
+	private QrcGenerationRequestValidator unit;
 	
 	@Before
 	public void setUp() {
 		request = createQrGenRequest();
 		transactionDomainData = new QrcGenerationTransactionDomainData();
-		unit = new QRGenerationRequestValidator();
+		unit = new QrcGenerationRequestValidator();
 		
 	}
 	private QrcGenerationRequest createQrGenRequest() {

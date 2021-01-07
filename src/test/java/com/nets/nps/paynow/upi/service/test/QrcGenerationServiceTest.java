@@ -19,6 +19,7 @@ import com.nets.nps.paynow.entity.QrcGenerationTransactionDomainData;
 import com.nets.nps.paynow.entity.UpiQrcGenerationResponse;
 import com.nets.nps.paynow.entity.UpiQrcGenerationTransactionResponse;
 import com.nets.nps.paynow.security.service.DetokenizationService;
+import com.nets.nps.paynow.service.impl.DetokenizationAdapter;
 import com.nets.nps.paynow.service.impl.QrcGenerationService;
 
 @SpringBootTest(classes = {QrcGenerationService.class})
@@ -29,7 +30,7 @@ public class QrcGenerationServiceTest {
 	QrcGenerationService unit;
 	
 	@MockBean
-	private DetokenizationService mockDetokenizationService;
+	private DetokenizationAdapter mockDetokenizationAdapter;
 	
 	@MockBean
 	private UpiClient mockUpiClient;
@@ -82,12 +83,12 @@ public class QrcGenerationServiceTest {
 		QrcGenerationRequest request = createQrcGenerationRequest();
 		UpiQrcGenerationResponse upiResponse = createUpiQrcGenerationResponse();
 
-		when(mockDetokenizationService.getTokenization(request)).thenReturn(request);
+		when(mockDetokenizationAdapter.detokenizationQrcGenerationRequest(request)).thenReturn(request);
 		when(mockUpiClient.sendAndReceiveFromUpi(request)).thenReturn(upiResponse);
 		
 		QrcGenerationResponse response = unit.process(request);
 		
-		verify(mockDetokenizationService, times(1)).getTokenization(request);
+		verify(mockDetokenizationAdapter, times(1)).detokenizationQrcGenerationRequest(request);
 		verify(mockUpiClient, times(1)).sendAndReceiveFromUpi(request);
 		
 		assertEquals(request.getRetrievalRef(), response.getRetrievalRef());

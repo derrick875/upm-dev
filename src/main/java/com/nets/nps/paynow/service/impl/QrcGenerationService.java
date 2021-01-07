@@ -8,7 +8,6 @@ import com.nets.nps.core.service.PaymentService;
 import com.nets.nps.paynow.entity.QrcGenerationRequest;
 import com.nets.nps.paynow.entity.QrcGenerationResponse;
 import com.nets.nps.paynow.entity.UpiQrcGenerationResponse;
-import com.nets.nps.paynow.security.service.DetokenizationService;
 import com.nets.upos.commons.logger.ApsLogger;
 
 @Service
@@ -17,7 +16,7 @@ public class QrcGenerationService implements PaymentService<QrcGenerationRequest
 	private static final ApsLogger logger = new ApsLogger(QrcGenerationService.class);
 
 	@Autowired
-	private DetokenizationService detokenizationService;
+	DetokenizationAdapter detokenizationAdapter;
 
 	@Autowired
 	private UpiClient upiClient;
@@ -26,7 +25,7 @@ public class QrcGenerationService implements PaymentService<QrcGenerationRequest
 	public QrcGenerationResponse process(QrcGenerationRequest request) throws Exception {
 
 		logger.info("QrcGenerationService Service Started.");
-		request = detokenizationService.getTokenization(request);
+		request = detokenizationAdapter.detokenizationQrcGenerationRequest(request);
 		UpiQrcGenerationResponse upiQrcGenerationResponse = upiClient.sendAndReceiveFromUpi(request);
 		QrcGenerationResponse response = createQrcGenerationResponse(request, upiQrcGenerationResponse);
 		

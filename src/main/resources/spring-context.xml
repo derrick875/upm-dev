@@ -30,7 +30,9 @@
 	<import
 		resource="classpath:META-INF/tsp-request.xml" />
 	<import
-		resource="classpath:META-INF/upi-request.xml" />
+		resource="classpath:META-INF/upi-request.xml" />	
+	<import
+		resource="classpath:META-INF/debit-transaction-request.xml" />
 		
 	<beans profile="local">
 		<bean id="solaceJndiTemplate"
