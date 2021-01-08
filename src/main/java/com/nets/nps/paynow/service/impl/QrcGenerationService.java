@@ -8,6 +8,7 @@ import com.nets.nps.core.service.PaymentService;
 import com.nets.nps.paynow.entity.QrcGenerationRequest;
 import com.nets.nps.paynow.entity.QrcGenerationResponse;
 import com.nets.nps.paynow.entity.UpiQrcGenerationResponse;
+import com.nets.nps.paynow.security.service.DetokenizationAdapter;
 import com.nets.upos.commons.logger.ApsLogger;
 
 @Service

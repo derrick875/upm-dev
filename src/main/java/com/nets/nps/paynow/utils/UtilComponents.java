@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Map;
 import java.util.Scanner;
 
 import org.springframework.core.io.ClassPathResource;
@@ -79,5 +80,14 @@ public class UtilComponents {
 				reader.close();
 		}
 		return jsonString;
+	}
+	
+	public static <K, V> K getKey(Map<K, V> map, V value) {
+		for (K key : map.keySet()) {
+			if (value.equals(map.get(key))) {
+				return key;
+			}
+		}
+		return null;
 	}
 }

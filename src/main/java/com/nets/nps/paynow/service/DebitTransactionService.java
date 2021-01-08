@@ -1,22 +1,14 @@
 package com.nets.nps.paynow.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import com.nets.nps.paynow.entity.DebitTransactionRequest;
-import com.nets.nps.paynow.entity.DebitTransactionResponse;
-import com.nets.nps.paynow.entity.MessageResponse;
 import com.nets.nps.paynow.entity.PullDebitRequest;
-import com.nets.nps.paynow.entity.PullDebitResponse;
 import com.nets.nps.paynow.entity.UpiProxyRequest;
 import com.nets.nps.paynow.service.impl.PullDebitRequestAdapter;
+import com.nets.nps.paynow.service.impl.WalletAdapter;
 import com.nets.nps.paynow.utils.UtilComponents;
 import com.nets.upos.commons.logger.ApsLogger;
 
@@ -26,18 +18,10 @@ public class DebitTransactionService {
 	private static final ApsLogger logger = new ApsLogger(DebitTransactionService.class);
 	
 	@Autowired
-	PullDebitRequestAdapter pulldebitRequestAdapter;
+	PullDebitRequestAdapter pullDebitRequestAdapter;
 	
 	@Autowired
-	@Qualifier("oneWay")
-	private RestTemplate restTemplate;
-	
-	@Value("${bank.service.base.url}")
-	private String bankUrl;
-	
-	private String url = "debit";
-	
-	ResponseEntity<String> bankResponse;
+	WalletAdapter walletAdapter;
 
 	@ServiceActivator
 	public String process(String message) {
@@ -45,42 +29,17 @@ public class DebitTransactionService {
 		UpiProxyRequest upiProxyRequest = (UpiProxyRequest) UtilComponents.getObjectFromString(message, UpiProxyRequest.class);
 		String debitTransactionRequestString = upiProxyRequest.getUpiProxyRequestJsonData();
 		DebitTransactionRequest debitTransactionRequest = (DebitTransactionRequest) UtilComponents.getObjectFromString(debitTransactionRequestString, DebitTransactionRequest.class);
-		// tokenized
+		
+		//TODO tokenized
 		
 		// convert to pull debit req
-		PullDebitRequest pullDebitRequest = pulldebitRequestAdapter.convertToPullDebitRequest(debitTransactionRequest);
+		PullDebitRequest pullDebitRequest = pullDebitRequestAdapter.convertToPullDebitRequest(debitTransactionRequest);
 		
-		// send to wallet (simulator in this case) and get response
-		String pullDebitRequestString = UtilComponents.getStringFromObject(pullDebitRequest);
-		HttpEntity<String> entity = new HttpEntity<String>(pullDebitRequestString);
-		String postUrl = bankUrl + "/" + url;
-		logger.info("Sending to url: " + postUrl);
-		bankResponse = restTemplate.exchange(postUrl, HttpMethod.POST, entity, String.class);
-		logger.info("Bank Response: " + bankResponse.getBody());
-		
-		//convert pull debit res to debit transaction res
-		PullDebitResponse pullDebitResponse = (PullDebitResponse) UtilComponents.getObjectFromString(bankResponse.getBody(), PullDebitResponse.class);
-		String debitTransactionResponseString = createDebitTransactionResponse(debitTransactionRequest, pullDebitResponse);
+		String debitTransactionResponseString = walletAdapter.sendAndReceiveFromBank(pullDebitRequest, debitTransactionRequest);
 		
 		String responseString = createResponseAndChangeToString(upiProxyRequest, debitTransactionResponseString);
 	
 		return responseString;
-	}
-
-
-	private String createDebitTransactionResponse(DebitTransactionRequest debitTransactionRequest, PullDebitResponse pullDebitResponse) {
-		DebitTransactionResponse debitTransactionResponse = new DebitTransactionResponse();
-		debitTransactionResponse.setMsgInfo(debitTransactionRequest.getMsgInfo());
-		MessageResponse msgResponse = new MessageResponse();
-		msgResponse.setResponseCode(pullDebitResponse.getResponseCode());
-		if(pullDebitResponse.getResponseCode().equals("00")) {
-			msgResponse.setResponseMsg("Approved");
-		}
-		debitTransactionResponse.setMsgResponse(msgResponse);
-		
-		String debitTransactionResponseString = UtilComponents.getStringFromObject(debitTransactionResponse);
-		
-		return debitTransactionResponseString;
 	}
 	
 	private String createResponseAndChangeToString(UpiProxyRequest upiProxyRequest, String debitTransactionResponseString) {

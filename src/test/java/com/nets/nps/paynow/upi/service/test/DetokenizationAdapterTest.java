@@ -13,8 +13,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import com.nets.nps.core.entity.Detokenization;
 import com.nets.nps.paynow.entity.QrcGenerationRequest;
 import com.nets.nps.paynow.entity.QrcGenerationTransactionDomainData;
+import com.nets.nps.paynow.security.service.DetokenizationAdapter;
 import com.nets.nps.paynow.security.service.DetokenizationService;
-import com.nets.nps.paynow.service.impl.DetokenizationAdapter;
 import com.nets.upos.commons.exception.BaseBusinessException;
 
 @SpringBootTest(classes = {DetokenizationAdapter.class})

@@ -18,8 +18,8 @@ import com.nets.nps.paynow.entity.QrcGenerationResponse;
 import com.nets.nps.paynow.entity.QrcGenerationTransactionDomainData;
 import com.nets.nps.paynow.entity.UpiQrcGenerationResponse;
 import com.nets.nps.paynow.entity.UpiQrcGenerationTransactionResponse;
+import com.nets.nps.paynow.security.service.DetokenizationAdapter;
 import com.nets.nps.paynow.security.service.DetokenizationService;
-import com.nets.nps.paynow.service.impl.DetokenizationAdapter;
 import com.nets.nps.paynow.service.impl.QrcGenerationService;
 
 @SpringBootTest(classes = {QrcGenerationService.class})

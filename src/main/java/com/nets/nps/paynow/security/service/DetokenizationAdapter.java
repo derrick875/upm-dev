@@ -1,4 +1,4 @@
-package com.nets.nps.paynow.service.impl;
+package com.nets.nps.paynow.security.service;
 
 import static com.nets.upos.commons.validations.helper.ObjectValidationHelpers.notNull;
 
@@ -15,7 +15,6 @@ import com.nets.nps.core.entity.DetokenizationBody;
 import com.nets.nps.core.entity.DetokenizationHeader;
 import com.nets.nps.core.entity.DetokenizationSpecificData;
 import com.nets.nps.paynow.entity.QrcGenerationRequest;
-import com.nets.nps.paynow.security.service.DetokenizationService;
 import com.nets.nps.paynow.utils.UtilComponents;
 import com.nets.upos.commons.exception.BaseBusinessException;
 import com.nets.upos.commons.logger.ApsLogger;
