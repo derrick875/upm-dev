@@ -3,6 +3,7 @@ package com.nets.nps.paynow.service.impl;
 import java.util.Map;
 import java.util.UUID;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -41,11 +42,11 @@ public class PullDebitRequestAdapter {
 		pullDebitRequest.setTransmissionTime(debitTransactionRequest.getTrxInfo().getTransDatetime());
 //		pullDebitRequest.setSofAccountId(debitTransactionRequest.getTrxInfo()); need to add after tokenization and use the token 
 		
-		transactionDomainData.setAmount(debitTransactionRequest.getTrxInfo().getTrxAmt());
+		transactionDomainData.setAmount(StringUtils.leftPad(debitTransactionRequest.getTrxInfo().getTrxAmt(), 12, "0"));
 		transactionDomainData.setAmountCurrency(debitTransactionRequest.getTrxInfo().getTrxCurrency());
 //		transactionDomainData.setDiscount("");
-		transactionDomainData.setFee(debitTransactionRequest.getTrxInfo().getFeeAmt());
-		transactionDomainData.setConvertedAmount(debitTransactionRequest.getTrxInfo().getSettAmt());
+		transactionDomainData.setFee(StringUtils.leftPad(debitTransactionRequest.getTrxInfo().getFeeAmt(), 12, "0"));
+		transactionDomainData.setConvertedAmount(StringUtils.leftPad(debitTransactionRequest.getTrxInfo().getSettAmt(), 12, "0"));
 		transactionDomainData.setConvertCurrency(debitTransactionRequest.getTrxInfo().getSettCurrency());
 		transactionDomainData.setConversionRate(debitTransactionRequest.getTrxInfo().getSettConvRate());
 		transactionDomainData.setTransactionType("1");
