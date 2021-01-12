@@ -39,7 +39,7 @@ public class PullDebitRequestAdapter {
 		pullDebitRequest.setInstitutionCode(netsInsId);
 		pullDebitRequest.setAcquirerInstitutionCode(upiAcquirerInsCode); // 
 		pullDebitRequest.setSofUri(sofUri);
-		pullDebitRequest.setTransmissionTime(debitTransactionRequest.getTrxInfo().getTransDatetime());
+		pullDebitRequest.setTransmissionTime(debitTransactionRequest.getMsgInfo().getTimeStamp().substring(4));
 //		pullDebitRequest.setSofAccountId(debitTransactionRequest.getTrxInfo()); need to add after tokenization and use the token 
 		
 		transactionDomainData.setAmount(StringUtils.leftPad(debitTransactionRequest.getTrxInfo().getTrxAmt(), 12, "0"));

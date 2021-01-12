@@ -19,18 +19,18 @@
         http://www.springframework.org/schema/integration/mail http://www.springframework.org/schema/integration/mail/spring-integration-mail.xsd
         http://www.springframework.org/schema/oxm http://www.springframework.org/schema/oxm/spring-oxm.xsd">
 
-	<bean id="fx.inboundResponseQueue" class="org.springframework.jndi.JndiObjectFactoryBean">
+	<bean id="debit.inboundResponseQueue" class="org.springframework.jndi.JndiObjectFactoryBean">
 		<property name="jndiTemplate" ref="solaceJndiTemplate" />
 		<property name="jndiName" value="${solace.debit.transaction.request.queue.name}" />
 	</bean>
 	
-	<bean id="fx.FxMessageListenerContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+	<bean id="debit.debitTransactionMessageListenerContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
 		<property name="connectionFactory" ref="solaceCachedConnectionFactory" />
-		<property name="destination" ref="fx.inboundResponseQueue" />
+		<property name="destination" ref="debit.inboundResponseQueue" />
 	</bean>
 
 	<int-jms:message-driven-channel-adapter
-		id="fx.JmsIn" channel="testInChannel" container="fx.FxMessageListenerContainer"
+		id="debit.JmsIn" channel="testInChannel" container="debit.debitTransactionMessageListenerContainer"
 		extract-payload="true" />
 
 	<int:channel id="testInChannel" />

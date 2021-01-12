@@ -9,6 +9,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.TestPropertySource;
 
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -25,6 +29,7 @@ import com.nets.nps.paynow.entity.MerchantInfo;
 import com.nets.nps.paynow.entity.MessageResponse;
 import com.nets.nps.paynow.entity.PullDebitRequest;
 import com.nets.nps.paynow.entity.PullDebitRequestTransactionDomainData;
+import com.nets.nps.paynow.entity.PullDebitResponse;
 import com.nets.nps.paynow.entity.UpiProxyRequest;
 import com.nets.nps.paynow.service.DebitTransactionService;
 import com.nets.nps.paynow.service.impl.PullDebitRequestAdapter;
@@ -32,7 +37,7 @@ import com.nets.nps.paynow.service.impl.WalletAdapter;
 import com.nets.nps.paynow.utils.UtilComponents;
 
 @SpringBootTest(classes = {DebitTransactionService.class})
-
+@TestPropertySource(locations = "classpath:paynow-local.properties")
 public class DebitTransactionServiceTest {
 	
 	@Autowired
@@ -44,8 +49,6 @@ public class DebitTransactionServiceTest {
 	@MockBean
 	WalletAdapter mockWalletAdapter;
 	
-//	String message = {"transactionType":"DEBIT_TRANSACTION","upiProxyRequestJsonData":"{\"msgInfo\":{\"versionNo\":\"1.0.0\",\"msgID\":\"U0053034420190808110118000001\",\"timeStamp\":\"20190808110118\",\"msgType\":\"DEBIT_TRANSACTION\",\"insID\":\"39990029\"},\"trxInfo\":{\"merchantInfo\":{\"acquirerIIN\":\"47010344\",\"fwdIIN\":\"00020344\",\"mid\":\"701034453110010\",\"merchantName\":\"testing merchant Macau MAC\",\"mcc\":\"5311\",\"merchantCountry\":\"344\",\"termId\":\"00104001\"},\"debitAccountInfo\":\"eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2Iiwia2lkIjoiMTU2MjAzMjg4NTk2MiJ9.IGVbmIFn7kqiSEQTYoCZDp7dxWHFKb gATceor14wOUjiTzjaq-BnKQ7UL8HEtT1K_OO2SmJf67-sREZ-widaS5gnjl_7vrDPMpRyitBnAsAaDcklcLq48CQ7jaTWrJg9te2m8U2VgyIdh7CVTpxS1yyon5CSTVSG94y qJm6O70Fh2zUDxqdPxXqfJj9bb1jMwofkOOwuHG-RhQNs6CP4zl22s7mnfg1h-tb-7J6BVD5Tu-zrt3VY6aAshooFDS63aesa9Xh7swQzBEIdBltSF-PHVMlok7_gnErTV MiiLRuonkPtZ801wvFaeH4Ppq9q3U1XGynSO7kbB6IlnHV2Hg.NDIxODViZDYyYzBkNGJjOA.Gt5I2aRcw0RL1YS860PDjXHoWQYtW9g6BT3snvFmCe0.gKc1fpZsZ3az 6jm7UpUoLA\",\"relTrxType\":\"CPQRC_PAYMENT\",\"onUsFlag\":\"N\",\"trxAmt\":\"2.22\",\"trxCurrency\":\"344\",\"billAmt\":\"2.22\",\"billCurrency\":\"344\",\"markupAmt\":\"0\",\"feeAmt\":\"0\",\"billConvRate\":\"1.000000\",\"settAmt\":\"0.28\",\"settCurrency\":\"840\",\"settConvRate\":\"0.1278459\",\"convDate\":\"0716\",\"settDate\":\"20190808\",\"posEntryModeCode\":\"042\",\"retrivlRefNum\":\"080887948744\"},\"correlationId\":\"529544fa-238a-44ae-b159-29a97d34eb76\"}","correlationId":"529544fa-238a-44ae-b159-29a97d34eb76"}"
-
 	private DebitTransactionRequest createDebitTransactionRequest() {
 		DebitTransactionRequest debitTransactionRequest = new DebitTransactionRequest();
 		MsgInfo msgInfo = new MsgInfo();
@@ -142,22 +145,37 @@ public class DebitTransactionServiceTest {
 
 		return debitTransactionResponseString;
 	}
+	
+	private String createPullDebitResponse(PullDebitRequest pullDebitReq) {
+		PullDebitResponse pullDebitRes = new PullDebitResponse();
+		pullDebitRes.setResponseCode("00");
+		pullDebitRes.setRetrievalRef(pullDebitReq.getRetrievalRef());
+		pullDebitRes.setTransmissionTime(pullDebitReq.getTransmissionTime());
+		pullDebitRes.setInstitutionCode(pullDebitReq.getInstitutionCode());
+		pullDebitRes.setDebitPassed("Y");
+		pullDebitRes.setDebitApprovalRetrievalRef("debit approval retrieval ref");
+
+		String pullDebitResponse = UtilComponents.getStringFromObject(pullDebitRes);
+		
+		return pullDebitResponse;
+	}
 	@Test
 	public void validateSuccessCase() throws JsonProcessingException {
 		DebitTransactionRequest debitTransactionRequest = createDebitTransactionRequest();
 		UpiProxyRequest upiProxyRequest = createUpiProxyRequest(debitTransactionRequest);
 		String message = createMessageString(debitTransactionRequest, upiProxyRequest);
 		PullDebitRequest pullDebitRequest = createPullDebitRequest();
+		String pullDebitResponseString = createPullDebitResponse(pullDebitRequest);
 		when(mockPullDebitRequestAdapter.convertToPullDebitRequest(any(DebitTransactionRequest.class))).thenReturn(pullDebitRequest);
 		
 		String debitTransactionResponseString = createDebitTransactionResponseString(debitTransactionRequest);
 		
-		when(mockWalletAdapter.sendAndReceiveFromBank(any(PullDebitRequest.class), any(DebitTransactionRequest.class))).thenReturn(debitTransactionResponseString);
+		when(mockWalletAdapter.sendAndReceiveFromBank(any(), any(HttpEntity.class))).thenReturn(new ResponseEntity<>(pullDebitResponseString, HttpStatus.OK));
 		
 		String responseString = unit.process(message);
 		UpiProxyRequest response = (UpiProxyRequest) UtilComponents.getObjectFromString(responseString, UpiProxyRequest.class);
 		verify(mockPullDebitRequestAdapter, times(1)).convertToPullDebitRequest(any(DebitTransactionRequest.class));
-		verify(mockWalletAdapter, times(1)).sendAndReceiveFromBank(any(PullDebitRequest.class), any(DebitTransactionRequest.class));
+		verify(mockWalletAdapter, times(1)).sendAndReceiveFromBank(any(), any(HttpEntity.class));
 		
 		assertEquals(response.getBankId(), upiProxyRequest.getBankId());
 		assertEquals(response.getBankType(), upiProxyRequest.getBankType());

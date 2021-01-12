@@ -27,46 +27,14 @@ public class WalletAdapter {
 	@Autowired
 	@Qualifier("oneWay")
 	private RestTemplate restTemplate;
-
-	@Value("${bank.service.base.url}")
-	private String bankUrlPrefix;
-
-	@Value("#{${bank.url}}")
-	private Map<String, String> bankUrlSuffixMap;
-
+	
 	ResponseEntity<String> bankResponse;
 
-	public String sendAndReceiveFromBank(PullDebitRequest pullDebitRequest,DebitTransactionRequest debitTransactionRequest ) {
-
-		String bankSuffix = bankUrlSuffixMap.get(pullDebitRequest.getInstitutionCode());
-		String postUrl = bankUrlPrefix + bankSuffix;
-		logger.info("Sending to url: " + postUrl);
-		
-		String pullDebitRequestString = UtilComponents.getStringFromObject(pullDebitRequest);
-		HttpEntity<String> entity = new HttpEntity<String>(pullDebitRequestString);
+	public ResponseEntity<String> sendAndReceiveFromBank(String postUrl, HttpEntity<String> entity) {
 		
 		bankResponse = restTemplate.exchange(postUrl, HttpMethod.POST, entity, String.class);
 		logger.info("Bank Response: " + bankResponse.getBody());
 
-		PullDebitResponse pullDebitResponse = (PullDebitResponse) UtilComponents.getObjectFromString(bankResponse.getBody(), PullDebitResponse.class);
-		String debitTransactionResponseString = createDebitTransactionResponse(debitTransactionRequest, pullDebitResponse);
-
-		return debitTransactionResponseString;
+		return bankResponse;
 	}
-	
-	private String createDebitTransactionResponse(DebitTransactionRequest debitTransactionRequest, PullDebitResponse pullDebitResponse) {
-		DebitTransactionResponse debitTransactionResponse = new DebitTransactionResponse();
-		debitTransactionResponse.setMsgInfo(debitTransactionRequest.getMsgInfo());
-		MessageResponse msgResponse = new MessageResponse();
-		msgResponse.setResponseCode(pullDebitResponse.getResponseCode());
-		if(pullDebitResponse.getResponseCode().equals("00")) {
-			msgResponse.setResponseMsg("Approved");
-		}
-		debitTransactionResponse.setMsgResponse(msgResponse);
-		
-		String debitTransactionResponseString = UtilComponents.getStringFromObject(debitTransactionResponse);
-		
-		return debitTransactionResponseString;
-	}
-	
 }
