@@ -8,10 +8,11 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.nets.nps.paynow.entity.QrcGenerationRequest;
-import com.nets.nps.paynow.entity.UpiQrcGenerationRequestTransactionRequest;
-import com.nets.nps.paynow.entity.UpiQrcGenerationRequest;
 import com.nets.nps.paynow.utils.UtilComponents;
+import com.nets.nps.upi.entity.MsgInfo;
+import com.nets.nps.upi.entity.QrcGenerationRequest;
+import com.nets.nps.upi.entity.UpiQrcGenerationRequest;
+import com.nets.nps.upi.entity.UpiQrcGenerationRequestTransactionRequest;
 import com.nets.upos.commons.logger.ApsLogger;
 
 @Service

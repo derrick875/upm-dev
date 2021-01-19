@@ -1,21 +1,14 @@
-package com.nets.nps.paynow.upi.service.test;
+package com.nets.nps.upi.service;
 
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.any;
+import static com.nets.upos.commons.validations.helper.ObjectValidationHelpers.notNull;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 import org.apache.commons.lang3.StringUtils;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.TestPropertySource;
+import org.springframework.stereotype.Service;
 
 import com.nets.nps.paynow.utils.UtilComponents;
 import com.nets.nps.upi.entity.Detokenization;
@@ -23,16 +16,16 @@ import com.nets.nps.upi.entity.DetokenizationBody;
 import com.nets.nps.upi.entity.DetokenizationHeader;
 import com.nets.nps.upi.entity.DetokenizationSpecificData;
 import com.nets.nps.upi.entity.QrcGenerationRequest;
-import com.nets.nps.upi.entity.QrcGenerationTransactionDomainData;
-import com.nets.nps.upi.handlers.TspCommunicationHandler;
-import com.nets.upos.commons.solace.SolaceMessageReceiver;
-import com.nets.upos.commons.solace.SolaceMessageSender;
+import com.nets.upos.commons.exception.BaseBusinessException;
+import com.nets.upos.commons.logger.ApsLogger;
 import com.nets.upos.commons.utils.DateUtil;
+import com.nets.upos.commons.validations.BusinessValidationErrorCodes;
 
-@SpringBootTest(classes = {TspCommunicationHandler.class})
-@TestPropertySource(locations = "classpath:paynow-local.properties")
-public class TspCommunicationHandlerTest {
-	
+@Service
+public class DetokenizationAdapter {
+
+	private static final ApsLogger logger = new ApsLogger(DetokenizationAdapter.class);
+
 	@Value("${product_indicator}")
 	private String product_indicator;
 
@@ -88,26 +81,25 @@ public class TspCommunicationHandlerTest {
 	private String sub_id;
 	
 	@Autowired
-	TspCommunicationHandler unit;
-	
-	@MockBean
-	SolaceMessageSender mockSolaceMessageSender;
-	
-	@Qualifier("tpsMessageReceiver")
-	@MockBean
-	SolaceMessageReceiver mockSolaceMessageReceiver;
-	
-	public String getRefWithPadding(String ref) {
-		String amountStrWithLeftPad = String.format("%012d", Long.valueOf(ref));
-		return amountStrWithLeftPad;
+	private DetokenizationService detokenizationService;
+
+	public QrcGenerationRequest detokenizationQrcGenerationRequest(QrcGenerationRequest qrcGenerationRequest) throws BaseBusinessException {
+		logger.info("Detokenization Adapter Started");
+		Detokenization detokenizationRequest = getDetokenRequest(qrcGenerationRequest);
+		logger.info("Detokenization object is: " + detokenizationRequest.log());
+		String netsTokenId = detokenizationService.getTokenization(detokenizationRequest);
+		
+		qrcGenerationRequest.setSofAccountId(netsTokenId);
+
+		logger.info("QrcGenerationRequest: " + qrcGenerationRequest.log());
+		return qrcGenerationRequest;
 	}
 
-	public static String addRightPadding(String tokenId) {
-		return StringUtils.rightPad(tokenId, 20);
-	}
-	
-	private Detokenization createDetokenization(QrcGenerationRequest request) {
-		Detokenization detoken = new Detokenization();
+	private Detokenization getDetokenRequest(QrcGenerationRequest qrGenerationRequest) throws BaseBusinessException {
+
+		notNull.test(qrGenerationRequest.getSofAccountId()).throwIfInvalid(BusinessValidationErrorCodes.INVALID_NETS_TOKEN_REF_ID);
+
+		Detokenization request = new Detokenization();
 		DetokenizationHeader header = new DetokenizationHeader();
 		DetokenizationBody body = new DetokenizationBody();
 
@@ -118,17 +110,19 @@ public class TspCommunicationHandlerTest {
 		header.setRelease_number(release_number);
 		header.setResponder_code(responder_code);
 		header.setStatus(status);
-		detoken.setHeader(header);
+		request.setHeader(header);
 		body.setNets_tag_2(nets_tag_2);
 		body.setProcessing_code(processing_code);
-		LocalDateTime date = DateUtil.parseLocalDateTime(request.getTransmissionTime());	
+		LocalDateTime date = DateUtil.parseLocalDateTime(qrGenerationRequest.getTransmissionTime());	
+		//body.setTrxn_amount(getAmountWithPadding(qrGenerationRequest.getTransactionDomainData().get);
 		body.setStan(UtilComponents.getTraceNum());
 		body.setTrxn_time(DateUtil.getDisplayTimeHHMMSS(date));
 		body.setTrxn_date(DateUtil.getDisplayDateMMDD(date));
 		body.setXmit_datetime(DateUtil.getDisplayDateMMDD(date)+DateUtil.getDisplayTimeHHMMSS(date));
 		body.setEntry_mode(entry_mode);
 		body.setCondition_code(condition_code);
-		body.setRet_ref_num(getRefWithPadding(request.getRetrievalRef()));
+		body.setRet_ref_num(getRefWithPadding(qrGenerationRequest.getRetrievalRef()));
+		//body.setTerminal_id(apsRequest.getTid());
 		body.setRetailer_id(retailer_id);
 		body.setRetailer_info(retailer_info);
 		ArrayList<DetokenizationSpecificData> txn_specific_datas= new ArrayList<DetokenizationSpecificData>();  
@@ -136,48 +130,20 @@ public class TspCommunicationHandlerTest {
 		txn_specific_data.setSub_id(sub_id);
 		txn_specific_data.setSub_length(sub_length);
 		txn_specific_data.setNets_bank_fiid(nets_bank_fiid);
-		txn_specific_data.setNets_token_id(addRightPadding(request.getSofAccountId()));
+		txn_specific_data.setNets_token_id(addRightPadding(qrGenerationRequest.getSofAccountId()));
 		txn_specific_data.setScheme_network_id(scheme_network_id);
 		txn_specific_datas.add(txn_specific_data);
 		body.setTxn_specific_data(txn_specific_datas);
-		detoken.setBody(body);
-
-		return detoken;
-	}
-	
-	private QrcGenerationRequest createQrcGenerationRequest() {
-		QrcGenerationRequest request = new QrcGenerationRequest();
-		request.setMti("0311");
-		request.setProcessCode("700000");
-		request.setRetrievalRef("123456781900");
-		request.setInstitutionCode("30000000001");
-		request.setAcquirerInstitutionCode("30000000044");
-		request.setSofUri("thisisthesofuri");
-		request.setTransmissionTime("0608123413");
-		request.setSofAccountId("sof_account_id");
-		QrcGenerationTransactionDomainData transactionDomainData = new QrcGenerationTransactionDomainData();
-		transactionDomainData.setTxnLimitAmount("000000000460");
-		transactionDomainData.setCvmLimitAmount("000000001000");
-		transactionDomainData.setAmountLimitCurrency("SGD");
-		transactionDomainData.setTransactionType("1");
-		request.setTransactionDomainData(transactionDomainData);
-
+		request.setBody(body);
 		return request;
 	}
-	
-	@Test
-	public void testSuccessCase() throws IOException {
-		
-		QrcGenerationRequest request = createQrcGenerationRequest();
-		Detokenization detoken = createDetokenization(request);
-		
-		String response = unit.sendAndReceive(detoken);
-		
-		verify(mockSolaceMessageSender, times(1)).put(any(), any());
-		verify(mockSolaceMessageReceiver, times(1)).receiveMessage(any());
-		
+
+	public String getRefWithPadding(String ref) {
+		String amountStrWithLeftPad = String.format("%012d", Long.valueOf(ref));
+		return amountStrWithLeftPad;
 	}
-	
-	
-	
+
+	public static String addRightPadding(String tokenId) {
+		return StringUtils.rightPad(tokenId, 20);
+	}
 }

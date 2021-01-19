@@ -5,9 +5,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import com.nets.nps.paynow.entity.QrcGenerationTransactionDomainData;
-import com.nets.nps.paynow.entity.QrcGenerationRequest;
-import com.nets.nps.paynow.service.impl.QrcGenerationRequestValidator;
+import com.nets.nps.upi.entity.QrcGenerationRequest;
+import com.nets.nps.upi.entity.QrcGenerationTransactionDomainData;
+import com.nets.nps.upi.service.impl.QrcGenerationRequestValidator;
 import com.nets.upos.commons.exception.JsonFormatException;
 
 @RunWith(JUnit4.class)
@@ -224,7 +224,7 @@ public class QrcGenerationRequestValidatorTest {
 	@Test(expected = JsonFormatException.class)
 	public void validateQRGenerationRequestAcqInstitutionCodeDecimalPoint() throws JsonFormatException {
 		// Testing decimal point for acq institution code
-		request.setAcquirerInstitutionCode("30 000000033");
+		request.setAcquirerInstitutionCode("30.000000033");
 		unit.validate(request);
 	}
 	

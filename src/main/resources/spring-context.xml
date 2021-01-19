@@ -33,6 +33,8 @@
 		resource="classpath:META-INF/upi-request.xml" />	
 	<import
 		resource="classpath:META-INF/debit-transaction-request.xml" />
+	<import
+		resource="classpath:META-INF/transaction-result-notification-request.xml" />
 		
 	<beans profile="local">
 		<bean id="solaceJndiTemplate"

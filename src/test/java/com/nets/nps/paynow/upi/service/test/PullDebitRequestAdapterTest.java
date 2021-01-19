@@ -11,18 +11,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
-import com.nets.nps.client.impl.MsgInfo;
-import com.nets.nps.paynow.entity.DebitTransactionRequest;
-import com.nets.nps.paynow.entity.DebitTransactionRequestTrxInfo;
-import com.nets.nps.paynow.entity.MerchantInfo;
-import com.nets.nps.paynow.entity.PullDebitRequest;
-import com.nets.nps.paynow.entity.PullDebitRequestTransactionDomainData;
-import com.nets.nps.paynow.service.impl.PullDebitRequestAdapter;
-
+import com.nets.nps.upi.entity.DebitTransactionRequest;
+import com.nets.nps.upi.entity.DebitTransactionRequestTrxInfo;
+import com.nets.nps.upi.entity.MerchantInfo;
+import com.nets.nps.upi.entity.MsgInfo;
+import com.nets.nps.upi.entity.PullDebitRequest;
+import com.nets.nps.upi.entity.PullDebitRequestTransactionDomainData;
+import com.nets.nps.upi.service.impl.PullDebitRequestAdapter;
 
 @SpringBootTest(classes = {PullDebitRequestAdapter.class})
 @TestPropertySource(locations = "classpath:paynow-local.properties")
-
 public class PullDebitRequestAdapterTest {
 
 	@Autowired
@@ -84,7 +82,7 @@ public class PullDebitRequestAdapterTest {
 		assertEquals("30000000001", pullDebitRequest.getInstitutionCode());
 		assertEquals("40000000001", pullDebitRequest.getAcquirerInstitutionCode());
 		assertEquals("http://dbs.com", pullDebitRequest.getSofUri());
-		assertEquals(debitTransactionRequest.getTrxInfo().getTransDatetime(), pullDebitRequest.getTransmissionTime());
+		assertEquals(debitTransactionRequest.getMsgInfo().getTimeStamp().substring(4), pullDebitRequest.getTransmissionTime());
 		assertNotNull(trxDomainData);
 		assertEquals(StringUtils.leftPad(trxInfo.getTrxAmt(), 12, "0"), trxDomainData.getAmount());
 		assertEquals(trxInfo.getTrxCurrency(), trxDomainData.getAmountCurrency());
@@ -93,10 +91,5 @@ public class PullDebitRequestAdapterTest {
 		assertEquals(trxInfo.getSettCurrency(), trxDomainData.getConvertCurrency());
 		assertEquals(trxInfo.getSettConvRate(), trxDomainData.getConversionRate());
 		assertEquals("1", trxDomainData.getTransactionType());
-		
-
-
-
-
 	}
 }

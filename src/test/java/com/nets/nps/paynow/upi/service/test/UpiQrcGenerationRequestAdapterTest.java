@@ -9,9 +9,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
 import com.nets.nps.client.impl.UpiQrcGenerationRequestAdapter;
-import com.nets.nps.paynow.entity.QrcGenerationRequest;
-import com.nets.nps.paynow.entity.QrcGenerationTransactionDomainData;
-import com.nets.nps.paynow.entity.UpiQrcGenerationRequest;
+import com.nets.nps.upi.entity.QrcGenerationRequest;
+import com.nets.nps.upi.entity.QrcGenerationTransactionDomainData;
+import com.nets.nps.upi.entity.UpiQrcGenerationRequest;
 
 @SpringBootTest(classes = {UpiQrcGenerationRequestAdapter.class})
 @TestPropertySource(locations = "classpath:paynow-local.properties")

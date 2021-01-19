@@ -6,10 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import com.nets.nps.paynow.entity.QrcGenerationRequest;
-import com.nets.nps.paynow.entity.UpiQrcGenerationRequest;
-import com.nets.nps.paynow.entity.UpiQrcGenerationResponse;
 import com.nets.nps.paynow.utils.UtilComponents;
+import com.nets.nps.upi.entity.QrcGenerationRequest;
+import com.nets.nps.upi.entity.UpiQrcGenerationRequest;
+import com.nets.nps.upi.entity.UpiQrcGenerationResponse;
 import com.nets.upos.commons.exception.BaseBusinessException;
 import com.nets.upos.commons.logger.ApsLogger;
 import com.nets.upos.commons.solace.UpiProxyReceiver;

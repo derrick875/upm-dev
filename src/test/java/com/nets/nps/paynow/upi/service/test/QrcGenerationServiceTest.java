@@ -10,17 +10,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-import com.nets.nps.client.impl.MsgInfo;
 import com.nets.nps.client.impl.UpiClient;
-import com.nets.nps.paynow.entity.MessageResponse;
-import com.nets.nps.paynow.entity.QrcGenerationRequest;
-import com.nets.nps.paynow.entity.QrcGenerationResponse;
-import com.nets.nps.paynow.entity.QrcGenerationTransactionDomainData;
-import com.nets.nps.paynow.entity.UpiQrcGenerationResponse;
-import com.nets.nps.paynow.entity.UpiQrcGenerationTransactionResponse;
-import com.nets.nps.paynow.security.service.DetokenizationAdapter;
-import com.nets.nps.paynow.security.service.DetokenizationService;
-import com.nets.nps.paynow.service.impl.QrcGenerationService;
+import com.nets.nps.upi.entity.MessageResponse;
+import com.nets.nps.upi.entity.MsgInfo;
+import com.nets.nps.upi.entity.QrcGenerationRequest;
+import com.nets.nps.upi.entity.QrcGenerationResponse;
+import com.nets.nps.upi.entity.QrcGenerationTransactionDomainData;
+import com.nets.nps.upi.entity.UpiQrcGenerationResponse;
+import com.nets.nps.upi.entity.UpiQrcGenerationTransactionResponse;
+import com.nets.nps.upi.service.DetokenizationAdapter;
+import com.nets.nps.upi.service.DetokenizationService;
+import com.nets.nps.upi.service.impl.QrcGenerationService;
 
 @SpringBootTest(classes = {QrcGenerationService.class})
 

@@ -21,20 +21,22 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nets.nps.client.impl.MsgInfo;
-import com.nets.nps.paynow.entity.DebitTransactionRequest;
-import com.nets.nps.paynow.entity.DebitTransactionRequestTrxInfo;
-import com.nets.nps.paynow.entity.DebitTransactionResponse;
-import com.nets.nps.paynow.entity.MerchantInfo;
-import com.nets.nps.paynow.entity.MessageResponse;
-import com.nets.nps.paynow.entity.PullDebitRequest;
-import com.nets.nps.paynow.entity.PullDebitRequestTransactionDomainData;
-import com.nets.nps.paynow.entity.PullDebitResponse;
-import com.nets.nps.paynow.entity.UpiProxyRequest;
-import com.nets.nps.paynow.service.DebitTransactionService;
-import com.nets.nps.paynow.service.impl.PullDebitRequestAdapter;
-import com.nets.nps.paynow.service.impl.WalletAdapter;
 import com.nets.nps.paynow.utils.UtilComponents;
+import com.nets.nps.upi.entity.DebitTransactionRequest;
+import com.nets.nps.upi.entity.DebitTransactionRequestTrxInfo;
+import com.nets.nps.upi.entity.DebitTransactionResponse;
+import com.nets.nps.upi.entity.MerchantInfo;
+import com.nets.nps.upi.entity.MessageResponse;
+import com.nets.nps.upi.entity.MsgInfo;
+import com.nets.nps.upi.entity.PullDebitRequest;
+import com.nets.nps.upi.entity.PullDebitRequestTransactionDomainData;
+import com.nets.nps.upi.entity.PullDebitResponse;
+import com.nets.nps.upi.entity.UpiProxyRequest;
+import com.nets.nps.upi.service.DebitTransactionService;
+import com.nets.nps.upi.service.impl.PullDebitRequestAdapter;
+import com.nets.nps.upi.service.impl.WalletAdapter;
+import com.nets.upos.commons.exception.BaseBusinessException;
+import com.nets.upos.commons.exception.JsonFormatException;
 
 @SpringBootTest(classes = {DebitTransactionService.class})
 @TestPropertySource(locations = "classpath:paynow-local.properties")
@@ -103,7 +105,7 @@ public class DebitTransactionServiceTest {
 		return upiProxyRequest;
 	}
 	
-	private String createMessageString(DebitTransactionRequest debitTransactionRequest, UpiProxyRequest upiProxyRequest) throws JsonProcessingException {
+	private String createMessageString(UpiProxyRequest upiProxyRequest) throws JsonProcessingException {
 		ObjectMapper mapper = new ObjectMapper();
 		String message = mapper.writeValueAsString(upiProxyRequest);
 		return message;
@@ -160,10 +162,10 @@ public class DebitTransactionServiceTest {
 		return pullDebitResponse;
 	}
 	@Test
-	public void validateSuccessCase() throws JsonProcessingException {
+	public void validateSuccessCase() throws JsonProcessingException, BaseBusinessException, JsonFormatException {
 		DebitTransactionRequest debitTransactionRequest = createDebitTransactionRequest();
 		UpiProxyRequest upiProxyRequest = createUpiProxyRequest(debitTransactionRequest);
-		String message = createMessageString(debitTransactionRequest, upiProxyRequest);
+		String message = createMessageString(upiProxyRequest);
 		PullDebitRequest pullDebitRequest = createPullDebitRequest();
 		String pullDebitResponseString = createPullDebitResponse(pullDebitRequest);
 		when(mockPullDebitRequestAdapter.convertToPullDebitRequest(any(DebitTransactionRequest.class))).thenReturn(pullDebitRequest);

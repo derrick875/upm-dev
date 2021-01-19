@@ -15,10 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-import com.nets.nps.core.entity.Detokenization;
-import com.nets.nps.paynow.handlers.TspCommunicationHandler;
-import com.nets.nps.paynow.security.service.DetokenizationService;
 import com.nets.nps.paynow.utils.UtilComponents;
+import com.nets.nps.upi.entity.Detokenization;
+import com.nets.nps.upi.handlers.TspCommunicationHandler;
+import com.nets.nps.upi.service.DetokenizationService;
 import com.nets.upos.commons.exception.BaseBusinessException;
 
 @SpringBootTest(classes = {DetokenizationService.class})

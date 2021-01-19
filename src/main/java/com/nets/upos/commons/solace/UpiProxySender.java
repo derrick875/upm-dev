@@ -10,8 +10,8 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
 import org.springframework.stereotype.Service;
 
-import com.nets.nps.paynow.entity.UpiQrcGenerationRequest;
 import com.nets.nps.paynow.utils.UtilComponents;
+import com.nets.nps.upi.entity.UpiQrcGenerationRequest;
 import com.nets.upos.commons.logger.ApsLogger;
 
 @Service

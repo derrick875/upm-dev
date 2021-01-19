@@ -10,11 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-import com.nets.nps.core.entity.Detokenization;
-import com.nets.nps.paynow.entity.QrcGenerationRequest;
-import com.nets.nps.paynow.entity.QrcGenerationTransactionDomainData;
-import com.nets.nps.paynow.security.service.DetokenizationAdapter;
-import com.nets.nps.paynow.security.service.DetokenizationService;
+import com.nets.nps.upi.entity.Detokenization;
+import com.nets.nps.upi.entity.QrcGenerationRequest;
+import com.nets.nps.upi.entity.QrcGenerationTransactionDomainData;
+import com.nets.nps.upi.service.DetokenizationAdapter;
+import com.nets.nps.upi.service.DetokenizationService;
 import com.nets.upos.commons.exception.BaseBusinessException;
 
 @SpringBootTest(classes = {DetokenizationAdapter.class})
