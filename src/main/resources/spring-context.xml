@@ -36,6 +36,9 @@
 	<import
 		resource="classpath:META-INF/transaction-result-notification-request.xml" />
 		
+			<import resource="classpath:META-INF/upi-cvm.xml" />
+		
+		
 	<beans profile="local">
 		<bean id="solaceJndiTemplate"
 			class="org.springframework.jndi.JndiTemplate">

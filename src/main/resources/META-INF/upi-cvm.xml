@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:int-jms="http://www.springframework.org/schema/integration/jms"
+	xmlns:int-stream="http://www.springframework.org/schema/integration/stream"
+	xmlns:int-event="http://www.springframework.org/schema/integration/event"
+	xmlns:int-http="http://www.springframework.org/schema/integration/http"
+	xmlns:int-ws="http://www.springframework.org/schema/integration/ws"
+	xmlns:int-mail="http://www.springframework.org/schema/integration/mail"
+	xmlns:oxm="http://www.springframework.org/schema/oxm"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+        http://www.springframework.org/schema/integration/jms http://www.springframework.org/schema/integration/jms/spring-integration-jms.xsd
+        http://www.springframework.org/schema/integration/stream http://www.springframework.org/schema/integration/stream/spring-integration-stream.xsd
+        http://www.springframework.org/schema/integration/event http://www.springframework.org/schema/integration/event/spring-integration-event.xsd
+        http://www.springframework.org/schema/integration/http http://www.springframework.org/schema/integration/http/spring-integration-http.xsd
+        http://www.springframework.org/schema/integration/ws http://www.springframework.org/schema/integration/ws/spring-integration-ws.xsd
+        http://www.springframework.org/schema/integration/mail http://www.springframework.org/schema/integration/mail/spring-integration-mail.xsd
+        http://www.springframework.org/schema/oxm http://www.springframework.org/schema/oxm/spring-oxm.xsd">
+
+	<int-jms:message-driven-channel-adapter
+		id="upiCvm.jmsIn" channel="upiCvm.jmsInChannel"
+		container="upiCvmGen.messageListenerContainer" extract-payload="true"
+		error-channel="errorChannel" />
+
+	<int:channel id="upiCvm.jmsInChannel">
+		<int:interceptors>
+			<int:wire-tap channel="upiCvmLog" />
+		</int:interceptors>
+	</int:channel>
+
+	<int:service-activator
+		input-channel="upiCvm.jmsInChannel"
+		output-channel="jsonJMSOutChannelUpiCvm"
+		ref="cvmCheckService" method="process">
+	</int:service-activator>
+	
+		<bean id="upiCvmGen.messageListenerContainer"
+		class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+		<property name="destination"
+			ref="upiCvm.processingRequestQueue" />
+		<property name="connectionFactory"
+			ref="solaceConnectionFactory" />
+		<property name="concurrentConsumers"
+			value="${high.usage.concurrent.consumers}" />
+		<property name="maxConcurrentConsumers"
+			value="${high.usage.max.concurrent.consumers}" />
+		<property name="idleConsumerLimit"
+			value="${high.usage.idle.consumer.limit}" />
+		<property name="receiveTimeout"
+			value="${high.usage.receive.timeout}" />
+		<property name="idleTaskExecutionLimit"
+			value="${high.usage.idle.taskexecution.limit}" />
+	</bean>
+
+	<bean id="upiCvm.processingRequestQueue"
+		class="org.springframework.jndi.JndiObjectFactoryBean">
+		<property name="jndiTemplate" ref="solaceJndiTemplate" />
+		<property name="jndiName"
+			value="${solace.upiproxy.to.npx.queue.name}" />
+	</bean>
+
+	<int:logging-channel-adapter
+		id="upiCvmLog" level="INFO" log-full-message="true"
+		logger-name="upiCvmLog" />
+
+	<int:channel id="jsonJMSOutChannelUpiCvm" />
+
+	<int-jms:outbound-channel-adapter
+		id="outputChannelUpiCvm" pub-sub-domain="true"
+		destination-expression="'${solace.npx.to.upiproxy.topic.name}'"
+		channel="jsonJMSOutChannelUpiCvm"
+		connection-factory="solaceCachedConnectionFactory">
+	</int-jms:outbound-channel-adapter>
+
+</beans>
