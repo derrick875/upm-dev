@@ -1,11 +1,13 @@
 package com.nets.nps.paynow.upi.service.test;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -16,10 +18,11 @@ import com.nets.nps.upi.entity.MsgInfo;
 import com.nets.nps.upi.entity.QrcGenerationRequest;
 import com.nets.nps.upi.entity.QrcGenerationResponse;
 import com.nets.nps.upi.entity.QrcGenerationTransactionDomainData;
+import com.nets.nps.upi.entity.UpiQrcGeneration;
 import com.nets.nps.upi.entity.UpiQrcGenerationResponse;
 import com.nets.nps.upi.entity.UpiQrcGenerationTransactionResponse;
 import com.nets.nps.upi.service.DetokenizationAdapter;
-import com.nets.nps.upi.service.DetokenizationService;
+import com.nets.nps.upi.service.UpiQrcGenerationService;
 import com.nets.nps.upi.service.impl.QrcGenerationService;
 
 @SpringBootTest(classes = {QrcGenerationService.class})
@@ -34,6 +37,9 @@ public class QrcGenerationServiceTest {
 	
 	@MockBean
 	private UpiClient mockUpiClient;
+	
+	@MockBean
+	private UpiQrcGenerationService mockUpiQrcGenerationService;
 	
 	private QrcGenerationRequest createQrcGenerationRequest() {
 		QrcGenerationRequest request = new QrcGenerationRequest();
@@ -98,6 +104,17 @@ public class QrcGenerationServiceTest {
 		assertEquals(request.getInstitutionCode(), response.getInstitutionCode());
 		assertEquals(upiResponse.getTrxInfo().getEmvCpqrcPayload(), response.getQrpayloadDataEmv());
 		assertEquals(upiResponse.getTrxInfo().getBarcodeCpqrcPayload(), response.getQrpayloadDataAlternate());
-		assertEquals(request.getSofAccountId(), response.getCpmqrpaymentToken());
+		assertNotNull(response.getCpmqrpaymentToken());
+		
+		ArgumentCaptor<UpiQrcGeneration> argumentCaptorUpiQrcGeneration = ArgumentCaptor.forClass(UpiQrcGeneration.class);
+		verify(mockUpiQrcGenerationService, times(1)).save(argumentCaptorUpiQrcGeneration.capture());
+		UpiQrcGeneration upiQrcGeneration = argumentCaptorUpiQrcGeneration.getValue();
+		
+		assertEquals(upiResponse.getTrxInfo().getCpqrcNo(), upiQrcGeneration.getCpqrcNo());
+		assertEquals(upiResponse.getTrxInfo().getEmvCpqrcPayload(), upiQrcGeneration.getEmvCpqrcPayload());
+		assertEquals(upiResponse.getTrxInfo().getBarcodeCpqrcPayload(), upiQrcGeneration.getBarcodeCpqrcPayload());
+		assertEquals(response.getCpmqrpaymentToken(), upiQrcGeneration.getCpmqrPaymentToken());
+		assertEquals(response.getTransmissionTime(), upiQrcGeneration.getTransmissionTime());
+		assertEquals(response.getInstitutionCode(), upiQrcGeneration.getInstitutionCode());
 	}
 }

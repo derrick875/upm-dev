@@ -7,6 +7,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
 @EnableTransactionManagement
-@EnableJpaRepositories(basePackages = { "com.nets.upos.core.repository" })
-@EntityScan(basePackages = { "com.nets.upos.core.entity" })
+@EnableJpaRepositories(basePackages = { "com.nets.upos.core.repository", "com.nets.nps.upi.repository" })
+@EntityScan(basePackages = { "com.nets.upos.core.entity", "com.nets.nps.upi.entity" })
 public class DefaultJPAConfiguration { }
