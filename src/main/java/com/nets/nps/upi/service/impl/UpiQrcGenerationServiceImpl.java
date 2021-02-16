@@ -23,4 +23,9 @@ public class UpiQrcGenerationServiceImpl implements UpiQrcGenerationService {
 		logger.info("Saved UpiQrcGeneration: " + upiQrcGeneration.log());
 		return savedUpiQrcGeneration;
 	}
+
+	@Override
+	public UpiQrcGeneration getUpiQrcGeneration(String emvCpqrcPayload) {
+		return upiQrcGenerationRepository.findByEmvCpqrcPayload(emvCpqrcPayload)  ;
+	}
 }

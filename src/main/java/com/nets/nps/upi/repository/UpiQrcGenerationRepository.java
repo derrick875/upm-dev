@@ -6,4 +6,5 @@ import com.nets.nps.upi.entity.UpiQrcGeneration;
 
 public interface UpiQrcGenerationRepository extends JpaRepository<UpiQrcGeneration, Long> {
 
+	public UpiQrcGeneration findByEmvCpqrcPayload(String emvCpqrcPayload);
 }

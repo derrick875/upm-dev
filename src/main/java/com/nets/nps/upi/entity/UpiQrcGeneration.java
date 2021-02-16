@@ -7,6 +7,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.nets.upos.commons.logger.Loggable;
 
 @Entity
@@ -29,24 +30,92 @@ public class UpiQrcGeneration implements Loggable{
 	@Column(name = "cpmqr_payment_token")
 	private String cpmqrPaymentToken;
 	
-	@Column(name = "transmission_time")
+	
+	@JsonProperty("retrieval_ref")
+	private String retrievalRef;
+	
+	@JsonProperty("institution_code")
+	private String institutionCode;
+	
+	@JsonProperty("acquirer_institution_code")
+	private String acquirerInstitutionCode;
+	
+	@JsonProperty("SOF_uri")
+	private String sofUri;
+	
+	@JsonProperty("transmission_time")
 	private String transmissionTime;
 	
-	@Column(name = "institution_code")
-	private String institutionCode;
+	@JsonProperty("sof_account_id")
+	private String sofAccountId;
+	
+//	public UpiQrcGeneration(Long id, String cpqrcNo, String emvCpqrcPayload, String barcodeCpqrcPayload,
+//			String cpmqrPaymentToken, String transmissionTime, String institutionCode) {
+//		this.id = id;
+//		this.cpqrcNo = cpqrcNo;
+//		this.emvCpqrcPayload = emvCpqrcPayload;
+//		this.barcodeCpqrcPayload = barcodeCpqrcPayload;
+//		this.cpmqrPaymentToken = cpmqrPaymentToken;
+//		this.transmissionTime = transmissionTime;
+//		this.institutionCode = institutionCode;
+//	}
+	
+	
+	
+	public UpiQrcGeneration() {
+	}
+
 
 	public UpiQrcGeneration(Long id, String cpqrcNo, String emvCpqrcPayload, String barcodeCpqrcPayload,
-			String cpmqrPaymentToken, String transmissionTime, String institutionCode) {
+			String cpmqrPaymentToken, String retrievalRef, String institutionCode, String acquirerInstitutionCode,
+			String sofUri, String transmissionTime, String sofAccountId) {
+		super();
 		this.id = id;
 		this.cpqrcNo = cpqrcNo;
 		this.emvCpqrcPayload = emvCpqrcPayload;
 		this.barcodeCpqrcPayload = barcodeCpqrcPayload;
 		this.cpmqrPaymentToken = cpmqrPaymentToken;
-		this.transmissionTime = transmissionTime;
+		this.retrievalRef = retrievalRef;
 		this.institutionCode = institutionCode;
+		this.acquirerInstitutionCode = acquirerInstitutionCode;
+		this.sofUri = sofUri;
+		this.transmissionTime = transmissionTime;
+		this.sofAccountId = sofAccountId;
 	}
-	
-	public UpiQrcGeneration() {
+
+ 
+	public String getRetrievalRef() {
+		return retrievalRef;
+	}
+
+
+	public void setRetrievalRef(String retrievalRef) {
+		this.retrievalRef = retrievalRef;
+	}
+
+
+	public String getAcquirerInstitutionCode() {
+		return acquirerInstitutionCode;
+	}
+
+	public void setAcquirerInstitutionCode(String acquirerInstitutionCode) {
+		this.acquirerInstitutionCode = acquirerInstitutionCode;
+	}
+
+	public String getSofUri() {
+		return sofUri;
+	}
+
+	public void setSofUri(String sofUri) {
+		this.sofUri = sofUri;
+	}
+
+	public String getSofAccountId() {
+		return sofAccountId;
+	}
+
+	public void setSofAccountId(String sofAccountId) {
+		this.sofAccountId = sofAccountId;
 	}
 
 	public Long getId() {

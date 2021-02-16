@@ -9,6 +9,7 @@ import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.stereotype.Service;
 
 import com.nets.nps.paynow.utils.UtilComponents;
+import com.nets.nps.upi.entity.AdditionalProcessingUpi;
 import com.nets.nps.upi.entity.AdditionalProcessingUpiRequest;
 import com.nets.nps.upi.entity.AdditionalProcessingUpiResponse;
 import com.nets.nps.upi.entity.CvmCheckRequest;
@@ -26,6 +27,9 @@ public class CvmCheckService {
 	@Autowired
 	private CvmCheckAdapter cvmCheckAdapter ;
 	
+	@Autowired
+	private UpiAddProcessingService upiAddProcessingService;
+	
 	@ServiceActivator
 	public String process(String additionalProcessingString) throws Exception {
 		// 1.take in an additionalProcessing request
@@ -34,9 +38,12 @@ public class CvmCheckService {
 		AdditionalProcessingUpiRequest addUPIRequest = (AdditionalProcessingUpiRequest) UtilComponents
 				.getObjectFromString(additionalProcessingString, AdditionalProcessingUpiRequest.class);
 		logger.info("additionalProcessingString cast to AdditionalProcessingUpiRequest  :" + addUPIRequest);
+		
+		//use incoming Additional Processing Request, save to Additional Processing Upi
+		AdditionalProcessingUpi adObj = saveAdditionalProcessingUpi(addUPIRequest) ;
 
 		// 2.  Detokenization of 2.52 Cvm Request
-		CvmCheckRequest cvmCheckRequest=cvmCheckAdapter.convertToCvmCheckRequest(addUPIRequest) ;
+		CvmCheckRequest cvmCheckRequest=cvmCheckAdapter.convertToCvmCheckRequest(adObj) ;
 		
 		String cvmReqString = UtilComponents.getStringFromObject(cvmCheckRequest);
 		
@@ -51,29 +58,51 @@ public class CvmCheckService {
 		// Proxy(433)
 
 		// create an addProcessingResponse object and convert back to string
-		AdditionalProcessingUpiResponse addResponseObject = createAdditionalProcessingResponse() ;
+		AdditionalProcessingUpiResponse addResponseObject = createAdditionalProcessingResponse(adObj) ;
 		String addResponse = UtilComponents.getStringFromObject(addResponseObject) ;
 
 		return addResponse;
 
 	}
 
-	private AdditionalProcessingUpiResponse createAdditionalProcessingResponse() {
-		final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
-		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+	private AdditionalProcessingUpiResponse createAdditionalProcessingResponse(AdditionalProcessingUpi adObj) {
+//		final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+//		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 		AdditionalProcessingUpiResponse addResponse = new AdditionalProcessingUpiResponse();
 		MsgInfo msgInfo = new MsgInfo();
-		msgInfo.setVersionNo("1.0.0");
-		msgInfo.setMsgId("U39999999000000000000479353");
-		msgInfo.setMsgType("ADDITIONAL_PROCESSING");
-		msgInfo.setTimeStamp(sdf.format(timestamp));
-		msgInfo.setInsID("39999999");
+		msgInfo.setVersionNo(adObj.getVersionNo() );
+		msgInfo.setMsgId(adObj.getMsgID() );
+		msgInfo.setMsgType(adObj.getMsgType() );
+		msgInfo.setTimeStamp(adObj.getTimeStamp() );
+		msgInfo.setInsID(adObj.getInsID() );
 		addResponse.setMsgInfo(msgInfo);
 		MessageResponse msgResponse = new MessageResponse();
 		msgResponse.setResponseCode("00");
 		msgResponse.setResponseMsg("Approved");
 		addResponse.setMsgResponse(msgResponse);
+		logger.info("addResponse" + addResponse.toString() );
+
 		return addResponse;
 	}
 	
+	public AdditionalProcessingUpi saveAdditionalProcessingUpi(AdditionalProcessingUpiRequest addUPIRequest) {
+		AdditionalProcessingUpi additionalProcessingUpi = new AdditionalProcessingUpi() ;
+		additionalProcessingUpi.setBarcodeCpqrcPayload(" ");
+		additionalProcessingUpi.setEmvCpqrcPayload(addUPIRequest.getTrxInfo().getEmvCpqrcPayload());
+		additionalProcessingUpi.setInsID(addUPIRequest.getMsgInfo().getInsID());
+		additionalProcessingUpi.setMsgID(addUPIRequest.getMsgInfo().getMsgId());
+		additionalProcessingUpi.setTimeStamp(addUPIRequest.getMsgInfo().getTimeStamp());
+		additionalProcessingUpi.setDeviceID(addUPIRequest.getTrxInfo().getDeviceID());
+		additionalProcessingUpi.setMsgType(addUPIRequest.getMsgInfo().getMsgType());
+		additionalProcessingUpi.setVersionNo(addUPIRequest.getMsgInfo().getVersionNo());
+		additionalProcessingUpi.setMerchantName(addUPIRequest.getTrxInfo().getMerchantName());
+		additionalProcessingUpi.setToken(addUPIRequest.getTrxInfo().getToken() );
+		additionalProcessingUpi.setTrxAmt(addUPIRequest.getTrxInfo().getTrxAmt());
+		additionalProcessingUpi.setTrxCurrency(addUPIRequest.getTrxInfo().getTrxCurrency() );
+		upiAddProcessingService.save(additionalProcessingUpi) ;
+		logger.info("additionalProcessingUpi:  "+ additionalProcessingUpi.log());
+		
+		return additionalProcessingUpi;
+		
+	}
 }

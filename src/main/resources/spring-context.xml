@@ -37,6 +37,7 @@
 		resource="classpath:META-INF/transaction-result-notification-request.xml" />
 		
 			<import resource="classpath:META-INF/upi-cvm.xml" />
+			<import resource="classpath:META-INF/upi-addpro-result.xml" />
 		
 		
 	<beans profile="local">

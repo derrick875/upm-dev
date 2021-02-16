@@ -8,4 +8,6 @@ import com.nets.nps.upi.entity.UpiQrcGeneration;
 public interface UpiQrcGenerationService {
 	
 	public UpiQrcGeneration save(UpiQrcGeneration upiQrcGeneration);
+	
+	public UpiQrcGeneration getUpiQrcGeneration(String emvCpqrcPayload) ;
 }

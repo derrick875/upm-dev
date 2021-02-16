@@ -25,7 +25,7 @@ public class AdditionalProcessingUpiResponse implements Serializable {
 	}
 	@Override
 	public String toString() {
-		return "AdditionalProcessingUpiResponse [msgInfo=" + msgInfo.toString() + ", msgResponse=" + msgResponse.toString() + "]";
+		return "AdditionalProcessingUpiResponse [msgInfo=" + msgInfo.log() + ", msgResponse=" + msgResponse.toString() + "]";
 	}
 }
 

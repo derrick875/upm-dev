@@ -15,29 +15,41 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
+import com.nets.nps.paynow.utils.UtilComponents;
 
 @Service
 public class WalletExchangeService {
 	private Logger logger = LoggerFactory.getLogger(WalletExchangeService.class);
 	
-	@Value("${upi.service.base.url}")
+	@Value("${bank.service.base.url}")
 	private String walletUrl;
 
 	@Value("#{${nets.wallet.geturl.instId.map}}")
+	private Map<String, String> bankInstIdUrlMap;
+	
+	@Value("#{${nets.upi.appgateway.instId.map}}")
 	private Map<String, String> instIdUrlMap;
 
 	@Autowired
 	@Qualifier("oneWay")
 	private RestTemplate restTemplate;
 
-	public String getWalletResponse(String req, String insID) {
-
+	public String getWalletResponse(String req, String bankInstitutionCode) {
+		logger.info("getWalletResponse bankInstitutionCode :  " + bankInstitutionCode );
+		String insID = UtilComponents.getKey(instIdUrlMap, bankInstitutionCode) ;
+		
+//		String insID = bankInstIdUrlMap.get(bankInstitutionCode) ;
 		// url : "/scis/switch/cvmcheckresponse" //combine both to one string
-		String addCvmUrl = null;
-		if (instIdUrlMap.get(insID) != null) {
-			addCvmUrl = instIdUrlMap.get(insID);
-		}
-
+//		String addCvmUrl = "";
+//		if (instIdUrlMap.get(insID) != null) {
+//			addCvmUrl = instIdUrlMap.get(insID);
+//			logger.info("addCvmUrl :  " + addCvmUrl);
+//		}
+		logger.info("getWalletResponse insID :  " + insID );
+		
+		String addCvmUrl = bankInstIdUrlMap.get(insID);
+		logger.info("addCvmUrl :  " + addCvmUrl);
+		
 		String getCvmUrl = walletUrl + addCvmUrl;
 		logger.info("WalletExchangeService getWalletResponse method start");
 		logger.info("getCvmUrl :  " + getCvmUrl);
